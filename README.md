@@ -15,6 +15,9 @@ https://github.com/suxianjia/xianjiaorm.git
 
 https://packagist.org/packages/suxianjia/xianjiaorm
 
+https://github.com/suxianjia/xianjiaorm.git
+
+
 git@github.com:suxianjia/xianjiaorm.git
 
 git remote add origin git@github.com:suxianjia/xianjiaorm.git
@@ -33,6 +36,9 @@ git push -u origin main
 
 composer require suxianjia/xianjiaorm
 php82 composer82.phar require  suxianjia/xianjiaorm
+
+composer require suxianjia/xianjiaorm
+
 
 https://packagist.org/packages/submit
  
