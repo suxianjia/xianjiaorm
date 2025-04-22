@@ -24,7 +24,12 @@ git push -u origin main
 
 https://github.com/suxianjia/xianjiaorm
 
-
+git init 
+git remote add origin git@github.com:suxianjia/xianjiaorm.git
+git branch -M main
+git add .
+git commit -m "init" 
+git push -u origin main
 
 composer require suxianjia/xianjiaorm
 php82 composer82.phar require  suxianjia/xianjiaorm
