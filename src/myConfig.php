@@ -1,5 +1,5 @@
 <?php 
-namespace Suxianjia\xianjialogwriter;
+namespace Suxianjia\xianjiaorm;
 use Exception;
  
 if (!defined('myAPP_VERSION')) {        exit('myAPP_VERSION is not defined'); }

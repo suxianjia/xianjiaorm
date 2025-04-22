@@ -1,9 +1,10 @@
 <?php 
-namespace Suxianjia\xianjialogwriter\orm;
+namespace Suxianjia\xianjiaorm\orm;
 use Exception;
 use mysqli;
-use Suxianjia\xianjialogwriter\myConfig;
-use Suxianjia\xianjialogwriter\client\myLogClient;
+use Suxianjia\xianjiaorm\myConfig;
+use Suxianjia\xianjialogwriter\client\myLogClient;//suxianjia/xianjialogwriter 
+use mysqli_result;
 if (!defined('myAPP_VERSION')) {        exit('myAPP_VERSION is not defined'); }
 if (!defined('myAPP_ENV')  ) {          exit ('myAPP_ENV is not defined'); }
 if (!defined('myAPP_DEBUG')) {          exit('myAPP_DEBUG is not defined'); }
@@ -99,4 +100,171 @@ public static function getRuntimePath(): string {
         }
         self::$instance = null; // Destroy the singleton instance
     }
+
+ 
+    // 查询分页  $this->getConnection() mysql page 分页
+    public function queryPage(string $sql, int $page, int $pageSize): array {
+        $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+
+        // Calculate offset for pagination
+        $offset = ($page - 1) * $pageSize;
+        $paginatedSql = $sql . " LIMIT $offset, $pageSize";
+
+        $result = $this->getConnection()->query($paginatedSql);
+        if ($result === false) {
+            myLogClient::getInstance()::writeErrorLog('SQL Error: ' . $paginatedSql, "Query failed: " . $this->getConnection()->error);
+            return ['code' => 500, 'msg' => "Query failed: " . $this->getConnection()->error, 'data' => []];
+        }
+
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        $result->free();
+
+        $results['code'] = 200;
+        $results['msg'] = 'Success';
+        $results['data'] = $data;
+
+        return $results;
+    }
+
+    // 查询一条数据 
+    public function selectOne(string $tableName, string $columnString  = '*', string $whereString = ''): ?array {
+        $results = ['code' => 500, 'msg' => 'Failed', 'data' => []   ];
+        $sql = "SELECT  $columnString  FROM `$tableName` WHERE $whereString LIMIT 1";
+        $result = $this->getConnection()->query($sql);
+ 
+        if ($result === false) {
+            myLogClient::getInstance()::writeErrorLog('SQL Error'.    $sql , "Select failed: " . $this->getConnection()->error);
+            return ['code' => 500, 'msg' => 'SQL Error'.    $sql , "Select failed: " . $this->getConnection()->error , 'data' => []];
+          
+        }
+
+        $row = $result->fetch_assoc();
+        $result->free();
+
+        $results ['data'] =  $row ?: null;
+        return  $results ;
+    }
+
+    // 更新数据
+    public function updateData(string $tableName, array $data, string $whereString = ''): array {
+        $results = ['code' => 500, 'msg' => 'Failed', 'data' => []   ];
+        if (empty($data)) {
+            myLogClient::getInstance()::writeErrorLog('SQL Error', "Update failed: No data provided for update.");
+            return ['code' => 500, 'msg' => 'Insert failed: No data provided for insert.', 'data' => []];
+        }
+
+        $updateString = implode(', ', array_map(function ($key, $value) {
+            $escapedValue = $this->getConnection()->real_escape_string($value);
+            return "`$key` = '$escapedValue'";
+        }, array_keys($data), $data));
+
+        $sql = "UPDATE `$tableName` SET $updateString";
+        if (!empty($whereString)) {
+            $sql .= " WHERE $whereString";
+        }
+
+        $result = $this->getConnection()->query($sql);
+        if ($result === false) {
+            myLogClient::getInstance()::writeErrorLog('SQL Error', "Update failed: " . $this->getConnection()->error . " | SQL: $sql");
+            return ['code' => 500, 'msg' => " SQL Error' Update failed: " . $this->getConnection()->error . " | SQL: $sql", 'data' => []];
+        }
+
+        return        $results ;
+    }
+// 删除数据 
+public function deleteData(string $tableName, string $whereString = ''): array {
+    $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+    if (empty($whereString)) {
+        myLogClient::getInstance()::writeErrorLog('SQL Error', "Delete failed: No condition provided for delete.");
+        return ['code' => 500, 'msg' => 'Delete failed: No condition provided for delete.', 'data' => []];
+    }
+
+    $sql = "DELETE FROM `$tableName` WHERE $whereString";
+
+    $result = $this->getConnection()->query($sql);
+    if ($result === false) {
+        myLogClient::getInstance()::writeErrorLog('SQL Error', "Delete failed: " . $this->getConnection()->error . " | SQL: $sql");
+        return ['code' => 500, 'msg' => "Delete failed: " . $this->getConnection()->error . " | SQL: $sql", 'data' => []];
+    }
+
+    $results['code'] = 200;
+    $results['msg'] = 'Success';
+    $results['data'] = ['affected_rows' => $this->getConnection()->affected_rows];
+    return $results;
+}
+
+
+    // 插入数据 
+public function insertData(string $tableName, array $data): array {
+    $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+    if (empty($data)) {
+        myLogClient::getInstance()::writeErrorLog('SQL Error', "Insert failed: No data provided for insert.");
+        return ['code' => 500, 'msg' => 'Insert failed: No data provided for insert.', 'data' => []];
+    }
+
+    $columns = implode(', ', array_keys($data));
+    $values = implode(', ', array_map(function ($value) {
+        return "'" . $this->getConnection()->real_escape_string($value) . "'";
+    }, $data));
+
+    $sql = "INSERT INTO `$tableName` ($columns) VALUES ($values)";
+
+    $result = $this->getConnection()->query($sql);
+    if ($result === false) {
+        myLogClient::getInstance()::writeErrorLog('SQL Error', "Insert failed: " . $this->getConnection()->error . " | SQL: $sql");
+        return ['code' => 500, 'msg' => "Insert failed: " . $this->getConnection()->error . " | SQL: $sql", 'data' => []];
+    }
+
+    $results['code'] = 200;
+    $results['msg'] = 'Success';
+    $results['data'] = ['insert_id' => $this->getConnection()->insert_id];
+    return $results;
+}
+
+
+
+
+// 查找数据 $this->getConnection()  mysqli getResults 
+public function query(string $sql): array {
+    $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+    $result = $this->getConnection()->query($sql);
+
+    if ($result === false) {
+        myLogClient::getInstance()::writeErrorLog('SQL Error', "Query failed: " . $this->getConnection()->error);
+        return ['code' => 500, 'msg' => "Query failed: " . $this->getConnection()->error, 'data' => []];
+    }
+
+    $data = [];
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
+    }
+    $result->free();
+
+    $results['code'] = 200;
+    $results['msg'] = 'Success';
+    $results['data'] = $data;
+
+    return $results;
+}
+// 执行语句 如 删除 更新 插入  $this->getConnection() mysqli execQuery
+public function execQuery(string $sql): array {
+    $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+    $result = $this->getConnection()->query($sql);
+
+    if ($result === false) {
+        myLogClient::getInstance()::writeErrorLog('SQL Error', "Execution failed: " . $this->getConnection()->error . " | SQL: $sql");
+        return ['code' => 500, 'msg' => "Execution failed: " . $this->getConnection()->error . " | SQL: $sql", 'data' => []];
+    }
+
+    $results['code'] = 200;
+    $results['msg'] = 'Success';
+    $results['data'] = ['affected_rows' => $this->getConnection()->affected_rows];
+    return $results;
+}
+
+// end 
+
 }

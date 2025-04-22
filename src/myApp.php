@@ -1,7 +1,8 @@
 <?php 
-namespace Suxianjia\xianjialogwriter;
-use Suxianjia\xianjialogwriter\myConfig;
+namespace Suxianjia\xianjiaorm;
+use Suxianjia\xianjiaorm\myConfig;
 use Exception;
+use Suxianjia\xianjiaorm\orm\myDatabase;
  
 use Suxianjia\xianjialogwriter\client\myLogClient;
 if (!defined('myAPP_VERSION')) {        exit('myAPP_VERSION is not defined'); }
@@ -38,11 +39,27 @@ class myApp {
     }
 
 
-    public function logwrite (){
+    public function getuserinfo ($id ): array {
         $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
-$a = "sdfdfdgr";
-$b = "sdfdfg".time() ;
-$results['data'] = [$a, $b]; 
+
+        $results['code'] = 200;
+        $results['msg'] = 'Success';
+        $results['data']['results'] = myDatabase::getInstance()->insertData( 'image_ocr_log', ['current_id' => $id]  );
+        // $results['data']['update'] = myDatabase::getInstance()->updateData('account_user_info',['client_id' => '2w4r4eete'] ,"`user_id` = {$id} ") ;
+
+        // $sql = "SELECT * FROM `account_user_info`  where `user_id` = {$id}";  
+        // $queryResult = myDatabase::getInstance()->query($sql);
+        // $results['data']['sql']= $sql;
+        // $results['data']['results'] = myDatabase::getInstance()->getResults($queryResult  ); // Assuming getResults() is the correct method
+        // $results['data']['results'] = myDatabase::getInstance()->selectOne('account_user_info','client_id',"`user_id` = {$id} ");
+        return $results;
+    }
+
+    public function logwrite (): array{
+        $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+        $a = "sdfdfdgr";
+        $b = "sdfdfg".time() ;
+        $results['data'] = [$a, $b]; 
         myLogClient::getInstance()::writeErrorLog($a,$b );
         return $results;
     }

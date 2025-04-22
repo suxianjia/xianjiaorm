@@ -4,15 +4,55 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ffe7e23ceff63f80cdaed982d10f237e",
-    "packages": [],
+    "content-hash": "5dc12ca17cb11ecefdd65c9eb5940ace",
+    "packages": [
+        {
+            "name": "suxianjia/xianjialogwriter",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/suxianjia/xianjialogwriter.git",
+                "reference": "9cd60d95335b49c1dc9509f2ed5c77f661104348"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/suxianjia/xianjialogwriter/zipball/9cd60d95335b49c1dc9509f2ed5c77f661104348",
+                "reference": "9cd60d95335b49c1dc9509f2ed5c77f661104348",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0|>=8.3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Suxianjia\\xianjialogwriter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "xianjia",
+                    "email": "605011288@qq.com"
+                }
+            ],
+            "description": "xianjialogwriter",
+            "support": {
+                "issues": "https://github.com/suxianjia/xianjialogwriter/issues",
+                "source": "https://github.com/suxianjia/xianjialogwriter/tree/v1.0.0"
+            },
+            "time": "2025-04-22T08:04:15+00:00"
+        }
+    ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {},
+    "platform": {
+        "php": "^8.0|>=8.3.3"
+    },
     "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

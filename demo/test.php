@@ -1,7 +1,7 @@
 <?php
  include_once __DIR__."/../vendor/autoload.php";
-use Suxianjia\xianjialogwriter\myConfig;
-use Suxianjia\xianjialogwriter\myApp;
+use Suxianjia\xianjiaorm\myConfig;
+use Suxianjia\xianjiaorm\myApp;
  
  
 
@@ -21,7 +21,7 @@ define("myAPP_RUNRIMT_PATH", __DIR__."/runtime/");
 
  
 $App =   myApp::getInstance( );   
-$result = $App->logwrite();
+$result = $App->getuserinfo(30312 );
 
 echo json_encode($result, JSON_UNESCAPED_UNICODE);
 

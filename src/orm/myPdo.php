@@ -1,10 +1,10 @@
 <?php
-namespace Suxianjia\xianjialogwriter\orm;
+namespace Suxianjia\xianjiaorm\orm;
 use PDO;
 use PDOException;
 use Exception;
-use Suxianjia\xianjialogwriter\myConfig;
-use Suxianjia\xianjialogwriter\client\myLogClient;
+use Suxianjia\xianjiaorm\myConfig;
+use Suxianjia\xianjialogwriter\client\myLogClient;//suxianjia/xianjialogwriter 
 if (!defined('myAPP_VERSION')) {        exit('myAPP_VERSION is not defined'); }
 if (!defined('myAPP_ENV')  ) {          exit ('myAPP_ENV is not defined'); }
 if (!defined('myAPP_DEBUG')) {          exit('myAPP_DEBUG is not defined'); }
