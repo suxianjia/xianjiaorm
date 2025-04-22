@@ -1,0 +1,19 @@
+{
+    "name": "suxianjia/xianjialogwriter",
+    "description": "xianjialogwriter",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Suxianjia\\xianjialogwriter\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "xianjia",
+             "email": "605011288@qq.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0|>=8.3.3"
+    }
+}
