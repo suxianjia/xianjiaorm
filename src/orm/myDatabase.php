@@ -20,10 +20,10 @@ class myDatabase {
 
     private static $instance = null;
     private static $mysqli;
-    private static $last_sql;
-    private static $last_error;
-    private static $runtime_path; // Declare the static property
-    private static $app_path; // Declare the static property for app path
+    private static $last_sql = "" ;
+    private static $last_error = "";
+    private static $runtime_path = "" ; // Declare the static property
+    private static $app_path = ""; // Declare the static property for app path
 
     private function __construct() {
 
