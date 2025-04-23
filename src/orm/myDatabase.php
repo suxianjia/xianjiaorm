@@ -21,6 +21,7 @@ class myDatabase {
     private static $instance = null;
     private static $mysqli;
     private static $last_sql;
+    private static $last_error;
     private static $runtime_path; // Declare the static property
     private static $app_path; // Declare the static property for app path
 
@@ -85,6 +86,15 @@ public static function getLastSql(): string {
 public static function setLastSql(string $sql): void {
     self::$last_sql = $sql;
 }
+//last_error
+public static function getLastError(): string {
+    return self::$last_error;
+}
+public static function setLastError(string $error): void {
+    self::$last_error = $error;
+}
+//runtime_path
+
 
     public static function setAppPath()    {
         self::$app_path = myAPP_PATH;
@@ -124,8 +134,10 @@ public static function getRuntimePath(): string {
 
         $result = $this->getConnection()->query($paginatedSql);
         if ($result === false) {
-            myLogClient::getInstance()::writeErrorLog('SQL Error: ' . $paginatedSql, "Query failed: " . $this->getConnection()->error);
-            return ['code' => 500, 'msg' => "Query failed: " . $this->getConnection()->error, 'data' => []];
+            $error = 'SQL Error: Query failed: ' . $this->getConnection()->error;
+            self::setLastError(   $error );
+            myLogClient::getInstance()::writeErrorLog(    $error);
+            return ['code' => 500, 'msg' =>  $error, 'data' => []];
         }
 
         $data = [];
@@ -149,7 +161,9 @@ public static function getRuntimePath(): string {
         $result = $this->getConnection()->query($sql);
 
         if ($result === false) {
-            myLogClient::getInstance()::writeErrorLog('SQL Error: ' . $sql, "Select failed: " . $this->getConnection()->error);
+            $error = 'SQL Error: Query failed: ' . $this->getConnection()->error;
+            self::setLastError(   $error );
+            myLogClient::getInstance()::writeErrorLog(   $error );
             return ['code' => 500, 'msg' => "Select failed: " . $this->getConnection()->error . " | SQL: $sql", 'data' => []];
         }
 
@@ -166,8 +180,10 @@ public static function getRuntimePath(): string {
     public function updateData(string $tableName, array $data, string $whereString = ''): array {
         $results = ['code' => 500, 'msg' => 'Failed', 'data' => []   ];
         if (empty($data)) {
-            myLogClient::getInstance()::writeErrorLog('SQL Error', "Update failed: No data provided for update.");
-            return ['code' => 500, 'msg' => 'Insert failed: No data provided for insert.', 'data' => []];
+            $error = 'Insert failed: No data provided for insert.';
+            self::setLastError(   $error );
+            myLogClient::getInstance()::writeErrorLog($error );
+            return ['code' => 500, 'msg' => $error, 'data' => []];
         }
 
         $updateString = implode(', ', array_map(function ($key, $value) {
@@ -182,8 +198,10 @@ public static function getRuntimePath(): string {
         self::setLastSql($sql);
         $result = $this->getConnection()->query($sql);
         if ($result === false) {
-            myLogClient::getInstance()::writeErrorLog('SQL Error', "Update failed: " . $this->getConnection()->error . " | SQL: $sql");
-            return ['code' => 500, 'msg' => " SQL Error' Update failed: " . $this->getConnection()->error . " | SQL: $sql", 'data' => []];
+            $error =  "Update failed: " . $this->getConnection()->error . " | SQL: $sql";
+            self::setLastError(   $error );
+            myLogClient::getInstance()::writeErrorLog(  $error);
+            return ['code' => 500, 'msg' =>    $error , 'data' => []];
         }
 
         return        $results ;
@@ -192,16 +210,20 @@ public static function getRuntimePath(): string {
 public function deleteData(string $tableName, string $whereString = ''): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
     if (empty($whereString)) {
-        myLogClient::getInstance()::writeErrorLog('SQL Error', "Delete failed: No condition provided for delete.");
-        return ['code' => 500, 'msg' => 'Delete failed: No condition provided for delete.', 'data' => []];
+        $error  =  'Delete failed: No condition provided for delete.';
+        self::setLastError(   $error );
+        myLogClient::getInstance()::writeErrorLog(     $error  );
+        return ['code' => 500, 'msg' =>    $error  , 'data' => []];
     }
 
     $sql = "DELETE FROM `$tableName` WHERE $whereString";
     self::setLastSql($sql);
     $result = $this->getConnection()->query($sql);
     if ($result === false) {
-        myLogClient::getInstance()::writeErrorLog('SQL Error', "Delete failed: " . $this->getConnection()->error . " | SQL: $sql");
-        return ['code' => 500, 'msg' => "Delete failed: " . $this->getConnection()->error . " | SQL: $sql", 'data' => []];
+        $error = "SQL Error , Delete failed: " . $this->getConnection()->error . " | SQL: $sql";
+        self::setLastError(   $error );
+        myLogClient::getInstance()::writeErrorLog(      $error  );
+        return ['code' => 500, 'msg' =>      $error , 'data' => []];
     }
 
     $results['code'] = 200;
@@ -215,8 +237,10 @@ public function deleteData(string $tableName, string $whereString = ''): array {
 public function insertData(string $tableName, array $data): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
     if (empty($data)) {
-        myLogClient::getInstance()::writeErrorLog('SQL Error', "Insert failed: No data provided for insert.");
-        return ['code' => 500, 'msg' => 'Insert failed: No data provided for insert.', 'data' => []];
+        $error = "Insert failed: No data provided for insert.";
+        self::setLastError(   $error );
+        myLogClient::getInstance()::writeErrorLog(    $error  );
+        return ['code' => 500, 'msg' =>    $error  , 'data' => []];
     }
 
     $columns = implode(', ', array_keys($data));
@@ -228,8 +252,10 @@ public function insertData(string $tableName, array $data): array {
     self::setLastSql($sql);
     $result = $this->getConnection()->query($sql);
     if ($result === false) {
-        myLogClient::getInstance()::writeErrorLog('SQL Error', "Insert failed: " . $this->getConnection()->error . " | SQL: $sql");
-        return ['code' => 500, 'msg' => "Insert failed: " . $this->getConnection()->error . " | SQL: $sql", 'data' => []];
+        $error  = "SQL Error , Insert failed: " . $this->getConnection()->error . " | SQL: $sql";
+        self::setLastError(   $error );
+        myLogClient::getInstance()::writeErrorLog(    $error  );
+        return ['code' => 500, 'msg' =>    $error  , 'data' => []];
     }
 
     $results['code'] = 200;
@@ -248,8 +274,10 @@ public function query(string $sql): array {
     $result = $this->getConnection()->query($sql);
 
     if ($result === false) {
-        myLogClient::getInstance()::writeErrorLog('SQL Error', "Query failed: " . $this->getConnection()->error);
-        return ['code' => 500, 'msg' => "Query failed: " . $this->getConnection()->error, 'data' => []];
+        $error  = "SQL Error , Query failed: " . $this->getConnection()->error . " | SQL: $sql";
+        self::setLastError(   $error );
+        myLogClient::getInstance()::writeErrorLog(         $error    );
+        return ['code' => 500, 'msg' =>         $error  , 'data' => []];
     }
 
     $data = [];
@@ -271,8 +299,10 @@ public function execQuery(string $sql): array {
     $result = $this->getConnection()->query($sql);
 
     if ($result === false) {
-        myLogClient::getInstance()::writeErrorLog('SQL Error', "Execution failed: " . $this->getConnection()->error . " | SQL: $sql");
-        return ['code' => 500, 'msg' => "Execution failed: " . $this->getConnection()->error . " | SQL: $sql", 'data' => []];
+        $error  = "SQL Error , Execution failed: " . $this->getConnection()->error . " | SQL: $sql";
+        self::setLastError(   $error );
+        myLogClient::getInstance()::writeErrorLog(       $error  );
+        return ['code' => 500, 'msg' =>       $error  , 'data' => []];
     }
 
     $results['code'] = 200;
@@ -289,8 +319,10 @@ public static function getCounts(string $tableName, string $whereStr = '1', stri
     self::setLastSql($sql);
     $result = self::getInstance()->getConnection()->query($sql);
     if ($result === false) {
-        myLogClient::getInstance()::writeErrorLog('SQL Error', "Count query failed: " . self::getInstance()->getConnection()->error . " | SQL: $sql");
-        return ['code' => 500, 'msg' => "Count query failed: " . self::getInstance()->getConnection()->error, 'data' => []];
+        $error  = "SQL Error , Count query failed: " . self::getInstance()->getConnection()->error . " | SQL: $sql";
+        self::setLastError(   $error );
+        myLogClient::getInstance()::writeErrorLog(     $error  );
+        return ['code' => 500, 'msg' =>      $error , 'data' => []];
     }
 
     $row = $result->fetch_assoc();
