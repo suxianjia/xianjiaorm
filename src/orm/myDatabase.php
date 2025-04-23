@@ -122,7 +122,44 @@ public static function getRuntimePath(): string {
         self::$instance = null; // Destroy the singleton instance
     }
 
+ // getdata($offset, $listRows, $item['field'], $item['joinStr'], $item['whereStr'], $item['tablename'], $item['key']);
+ // $offset == 开始页 ， 
+ // listRows == 每页条数， 
+ // $item['field'] == 字段， 
+ // $item['joinStr'] == 连接， 
+ // $item['whereStr'] == 条件， 
+ // $item['tablename'] == 表名， 
+ // $item['key'] == key 主键
  
+public function getData(int $offset, int $listRows, string $fields, string $joinStr, string $whereStr, string $tableName, string $key): array {
+    $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+    $sql = "SELECT $fields FROM `$tableName` $joinStr WHERE $whereStr ORDER BY `$key` ASC LIMIT $offset, $listRows";
+    self::setLastSql($sql);
+
+    $result = $this->getConnection()->query($sql);
+    if ($result === false) {
+        $error = 'SQL Error: Query failed: ' . $this->getConnection()->error;
+        self::setLastError($error);
+        myLogClient::getInstance()::writeErrorLog($error);
+        return ['code' => 500, 'msg' => $error, 'data' => []];
+    }
+
+    $data = [];
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
+    }
+    $result->free();
+
+    $results['code'] = 200;
+    $results['msg'] = 'Success';
+    $results['data'] = $data;
+
+    return $results;
+}
+
+
+
+
     // 查询分页  $this->getConnection() mysql page 分页
     public function queryPage(string $sql, int $page, int $pageSize): array {
         $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
