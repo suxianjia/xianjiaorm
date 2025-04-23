@@ -265,6 +265,28 @@ public function execQuery(string $sql): array {
     return $results;
 }
 
+
+// $this->getConnection() mysqli SELECT COUNT
+public static function getCounts(string $tableName, string $whereStr = '1'): array {
+    $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+    $sql = "SELECT COUNT(*) as count FROM `$tableName` WHERE $whereStr";
+
+    $result = self::getInstance()->getConnection()->query($sql);
+    if ($result === false) {
+        myLogClient::getInstance()::writeErrorLog('SQL Error', "Count query failed: " . self::getInstance()->getConnection()->error . " | SQL: $sql");
+        return ['code' => 500, 'msg' => "Count query failed: " . self::getInstance()->getConnection()->error, 'data' => []];
+    }
+
+    $row = $result->fetch_assoc();
+    $result->free();
+
+    $results['code'] = 200;
+    $results['msg'] = 'Success';
+    $results['data'] = ['count' => $row['count'] ?? 0];
+
+    return $results;
+}
+
 // end 
 
 }
