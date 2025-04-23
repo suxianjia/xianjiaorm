@@ -129,23 +129,24 @@ public static function getRuntimePath(): string {
         return $results;
     }
 
-    // 查询一条数据 
-    public function selectOne(string $tableName, string $columnString  = '*', string $whereString = ''): ?array {
-        $results = ['code' => 500, 'msg' => 'Failed', 'data' => []   ];
-        $sql = "SELECT  $columnString  FROM `$tableName` WHERE $whereString LIMIT 1";
+    // 查询一条数据  增加了  joinStr
+    public function selectOne(string $tableName, string $columnString = '*', string $whereString = '', string $joinStr = ''): ?array {
+        $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+        $sql = "SELECT $columnString FROM `$tableName` $joinStr WHERE $whereString LIMIT 1";
         $result = $this->getConnection()->query($sql);
- 
+
         if ($result === false) {
-            myLogClient::getInstance()::writeErrorLog('SQL Error'.    $sql , "Select failed: " . $this->getConnection()->error);
-            return ['code' => 500, 'msg' => 'SQL Error'.    $sql , "Select failed: " . $this->getConnection()->error , 'data' => []];
-          
+            myLogClient::getInstance()::writeErrorLog('SQL Error: ' . $sql, "Select failed: " . $this->getConnection()->error);
+            return ['code' => 500, 'msg' => "Select failed: " . $this->getConnection()->error . " | SQL: $sql", 'data' => []];
         }
 
         $row = $result->fetch_assoc();
         $result->free();
 
-        $results ['data'] =  $row ?: null;
-        return  $results ;
+        $results['code'] = 200;
+        $results['msg'] = 'Success';
+        $results['data'] = $row ?: null;
+        return $results;
     }
 
     // 更新数据
@@ -266,10 +267,10 @@ public function execQuery(string $sql): array {
 }
 
 
-// $this->getConnection() mysqli SELECT COUNT
-public static function getCounts(string $tableName, string $whereStr = '1'): array {
+// $this->getConnection() mysqli SELECT COUNT  增加了  joinStr
+public static function getCounts(string $tableName, string $whereStr = '1', string $joinStr = ''): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
-    $sql = "SELECT COUNT(*) as count FROM `$tableName` WHERE $whereStr";
+    $sql = "SELECT COUNT(*) as count FROM `$tableName` $joinStr WHERE $whereStr";
 
     $result = self::getInstance()->getConnection()->query($sql);
     if ($result === false) {
