@@ -20,6 +20,7 @@ class myDatabase {
 
     private static $instance = null;
     private static $mysqli;
+    private static $last_sql;
     private static $runtime_path; // Declare the static property
     private static $app_path; // Declare the static property for app path
 
@@ -75,6 +76,16 @@ class myDatabase {
     public function getConnection(): mysqli {
         return self::$mysqli;
     }
+
+
+    // last_sql
+public static function getLastSql(): string {
+    return self::$last_sql;
+}
+public static function setLastSql(string $sql): void {
+    self::$last_sql = $sql;
+}
+
     public static function setAppPath()    {
         self::$app_path = myAPP_PATH;
     }
@@ -109,6 +120,7 @@ public static function getRuntimePath(): string {
         // Calculate offset for pagination
         $offset = ($page - 1) * $pageSize;
         $paginatedSql = $sql . " LIMIT $offset, $pageSize";
+        self::setLastSql($paginatedSql);
 
         $result = $this->getConnection()->query($paginatedSql);
         if ($result === false) {
@@ -133,6 +145,7 @@ public static function getRuntimePath(): string {
     public function selectOne(string $tableName, string $columnString = '*', string $whereString = '', string $joinStr = ''): ?array {
         $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
         $sql = "SELECT $columnString FROM `$tableName` $joinStr WHERE $whereString LIMIT 1";
+        self::setLastSql($sql);
         $result = $this->getConnection()->query($sql);
 
         if ($result === false) {
@@ -166,7 +179,7 @@ public static function getRuntimePath(): string {
         if (!empty($whereString)) {
             $sql .= " WHERE $whereString";
         }
-
+        self::setLastSql($sql);
         $result = $this->getConnection()->query($sql);
         if ($result === false) {
             myLogClient::getInstance()::writeErrorLog('SQL Error', "Update failed: " . $this->getConnection()->error . " | SQL: $sql");
@@ -184,7 +197,7 @@ public function deleteData(string $tableName, string $whereString = ''): array {
     }
 
     $sql = "DELETE FROM `$tableName` WHERE $whereString";
-
+    self::setLastSql($sql);
     $result = $this->getConnection()->query($sql);
     if ($result === false) {
         myLogClient::getInstance()::writeErrorLog('SQL Error', "Delete failed: " . $this->getConnection()->error . " | SQL: $sql");
@@ -212,7 +225,7 @@ public function insertData(string $tableName, array $data): array {
     }, $data));
 
     $sql = "INSERT INTO `$tableName` ($columns) VALUES ($values)";
-
+    self::setLastSql($sql);
     $result = $this->getConnection()->query($sql);
     if ($result === false) {
         myLogClient::getInstance()::writeErrorLog('SQL Error', "Insert failed: " . $this->getConnection()->error . " | SQL: $sql");
@@ -231,6 +244,7 @@ public function insertData(string $tableName, array $data): array {
 // 查找数据 $this->getConnection()  mysqli getResults 
 public function query(string $sql): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+    self::setLastSql($sql);
     $result = $this->getConnection()->query($sql);
 
     if ($result === false) {
@@ -253,6 +267,7 @@ public function query(string $sql): array {
 // 执行语句 如 删除 更新 插入  $this->getConnection() mysqli execQuery
 public function execQuery(string $sql): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+    self::setLastSql($sql);
     $result = $this->getConnection()->query($sql);
 
     if ($result === false) {
@@ -271,7 +286,7 @@ public function execQuery(string $sql): array {
 public static function getCounts(string $tableName, string $whereStr = '1', string $joinStr = ''): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
     $sql = "SELECT COUNT(*) as count FROM `$tableName` $joinStr WHERE $whereStr";
-
+    self::setLastSql($sql);
     $result = self::getInstance()->getConnection()->query($sql);
     if ($result === false) {
         myLogClient::getInstance()::writeErrorLog('SQL Error', "Count query failed: " . self::getInstance()->getConnection()->error . " | SQL: $sql");
