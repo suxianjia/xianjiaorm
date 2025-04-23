@@ -131,7 +131,7 @@ public static function getRuntimePath(): string {
  // $item['tablename'] == 表名， 
  // $item['key'] == key 主键
  
-public function getData(int $offset, int $listRows, string $fields, string $joinStr, string $whereStr, string $tableName, string $key): array {
+public  function getData(int $offset, int $listRows, string $fields, string $joinStr, string $whereStr, string $tableName, string $key): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
     $sql = "SELECT $fields FROM `$tableName` $joinStr WHERE $whereStr ORDER BY `$key` ASC LIMIT $offset, $listRows";
     self::setLastSql($sql);
@@ -350,7 +350,7 @@ public function execQuery(string $sql): array {
 
 
 // $this->getConnection() mysqli SELECT COUNT  增加了  joinStr
-public static function getCounts(string $tableName, string $whereStr = '1', string $joinStr = ''): array {
+public function getCounts(string $tableName, string $whereStr = '1', string $joinStr = ''): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
     $sql = "SELECT COUNT(*) as count FROM `$tableName` $joinStr WHERE $whereStr";
     self::setLastSql($sql);
