@@ -133,7 +133,7 @@ public static function getRuntimePath(): string {
  
 public  function getData(int $offset, int $listRows, string $fields, string $joinStr, string $whereStr, string $tableName, string $key): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
-    $sql = "SELECT $fields FROM `$tableName` $joinStr WHERE $whereStr ORDER BY `$key` ASC LIMIT $offset, $listRows";
+    $sql = "SELECT $fields FROM $tableName $joinStr WHERE $whereStr ORDER BY $key ASC LIMIT $offset, $listRows";
     self::setLastSql($sql);
 
     $result = $this->getConnection()->query($sql);
@@ -193,7 +193,7 @@ public  function getData(int $offset, int $listRows, string $fields, string $joi
     // 查询一条数据  增加了  joinStr
     public function selectOne(string $tableName, string $columnString = '*', string $whereString = '', string $joinStr = ''): ?array {
         $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
-        $sql = "SELECT $columnString FROM `$tableName` $joinStr WHERE $whereString LIMIT 1";
+        $sql = "SELECT $columnString FROM $tableName $joinStr WHERE $whereString LIMIT 1";
         self::setLastSql($sql);
         $result = $this->getConnection()->query($sql);
 
@@ -225,10 +225,10 @@ public  function getData(int $offset, int $listRows, string $fields, string $joi
 
         $updateString = implode(', ', array_map(function ($key, $value) {
             $escapedValue = $this->getConnection()->real_escape_string($value);
-            return "`$key` = '$escapedValue'";
+            return " $key = '$escapedValue'";
         }, array_keys($data), $data));
 
-        $sql = "UPDATE `$tableName` SET $updateString";
+        $sql = "UPDATE $tableName SET $updateString";
         if (!empty($whereString)) {
             $sql .= " WHERE $whereString";
         }
@@ -253,7 +253,7 @@ public function deleteData(string $tableName, string $whereString = ''): array {
         return ['code' => 500, 'msg' =>    $error  , 'data' => []];
     }
 
-    $sql = "DELETE FROM `$tableName` WHERE $whereString";
+    $sql = "DELETE FROM $tableName WHERE $whereString";
     self::setLastSql($sql);
     $result = $this->getConnection()->query($sql);
     if ($result === false) {
@@ -285,7 +285,7 @@ public function insertData(string $tableName, array $data): array {
         return "'" . $this->getConnection()->real_escape_string($value) . "'";
     }, $data));
 
-    $sql = "INSERT INTO `$tableName` ($columns) VALUES ($values)";
+    $sql = "INSERT INTO $tableName ($columns) VALUES ($values)";
     self::setLastSql($sql);
     $result = $this->getConnection()->query($sql);
     if ($result === false) {
@@ -352,7 +352,7 @@ public function execQuery(string $sql): array {
 // $this->getConnection() mysqli SELECT COUNT  增加了  joinStr
 public function getCounts(string $tableName, string $whereStr = '1', string $joinStr = ''): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
-    $sql = "SELECT COUNT(*) as count FROM `$tableName` $joinStr WHERE $whereStr";
+    $sql = "SELECT COUNT(*) as count FROM $tableName $joinStr WHERE $whereStr";
     self::setLastSql($sql);
     $result = self::getInstance()->getConnection()->query($sql);
     if ($result === false) {
