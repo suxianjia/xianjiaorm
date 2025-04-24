@@ -133,7 +133,7 @@ public static function getRuntimePath(): string {
  
 public  function getData(int $offset, int $listRows, string $fields, string $joinStr, string $whereStr, string $tableName, string $key): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
-    $sql = "SELECT $fields FROM $tableName $joinStr WHERE $whereStr ORDER BY $key ASC LIMIT $offset, $listRows";
+    $sql = "SELECT $fields FROM $tableName $joinStr WHERE $whereStr ORDER BY $key DESC LIMIT $offset, $listRows";
     self::setLastSql($sql);
 
     $result = $this->getConnection()->query($sql);
