@@ -1,0 +1,15 @@
+#!/bin/sh
+if find . -type f -size +90M | grep .; then
+  echo "错误：存在超过90MB的文件！"
+  exit 1
+fi
+
+
+
+#   git filter-branch --force --index-filter \
+#   'git rm --cached --ignore-unmatch src/client/Umi-OCR_Project/.embeddable/lib/python3.10/site-packages/PySide2/Qt/lib/libQt5WebEngineCore.so.5' \
+#   --prune-empty --tag-name-filter cat -- --all
+
+# git push origin master --force --all
+# git reflog expire --expire=now --all
+# git gc --prune=now

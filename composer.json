@@ -2,6 +2,7 @@
     "name": "suxianjia/xianjiaorm",
     "description": "xianjiaorm",
     "type": "library",
+            "license": "MIT",
     "autoload": {
         "psr-4": {
             "Suxianjia\\xianjiaorm\\": "src/"
